@@ -15,7 +15,7 @@ class SplashActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Cek status autentikasi
+        // Cek status autentikasi (done)
         val currentUser = auth.currentUser
         if (currentUser != null) {
             // Jika sudah login, arahkan ke HomeActivity
