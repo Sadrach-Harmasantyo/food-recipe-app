@@ -75,12 +75,6 @@ class RecipeAdapter(
         return recipeList.size
     }
 
-    // Method to update the list and refresh the RecyclerView
-    fun updateList(newList: List<Recipe>) {
-        recipeList = newList
-        notifyDataSetChanged()
-    }
-
     private fun checkIfBookmarked(holder: RecipeViewHolder, recipe: Recipe) {
         val currentUser = auth.currentUser
         if (currentUser != null && !recipe.id.isNullOrEmpty()) {

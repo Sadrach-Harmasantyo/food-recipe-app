@@ -34,10 +34,6 @@ class ProfileFragment : Fragment() {
     private var userRecipes: MutableList<Recipe> = mutableListOf()
     private var listenerRegistration: ListenerRegistration? = null
 
-//    companion object {
-//        private const val TAG = "ProfileFragment"
-//    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -60,12 +56,12 @@ class ProfileFragment : Fragment() {
         profileRecipeRecyclerView.layoutManager = LinearLayoutManager(context)
 
         // Load user recipes
-        loadUserRecipesReal()
+        loadUserRecipes()
 
         return view
     }
 
-    private fun loadUserRecipesReal() {
+    private fun loadUserRecipes() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             listenerRegistration = firestore.collection("recipes")
@@ -108,218 +104,6 @@ class ProfileFragment : Fragment() {
         startActivity(intent)
     }
 
-    // Delete recipe functionality
-    private fun deleteRecipe(recipe: Recipe) {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            firestore.collection("recipes")
-                .document(recipe.id)
-                .delete()
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Recipe deleted", Toast.LENGTH_SHORT).show()
-
-                    // Remove the recipe from the list and refresh the adapter
-                    userRecipes.remove(recipe)
-                    recipeAdapter.notifyDataSetChanged()
-
-                    // After deleting recipe from Firestore, delete the image from Firebase Storage
-                    deleteRecipeImage(recipe.imageUrl)
-                }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Failed to delete recipe", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-            firestore.collection("users")
-                .document(currentUser.uid)
-                .collection("bookmarks")
-                .document(recipe.id)
-                .delete()
-                .addOnSuccessListener {
-                    //
-                    Toast.makeText(context, "Recipe from bookmarks deleted", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener {
-                    //
-                    Toast.makeText(context, "Failed to delete recipe from bookmarks", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }
-
-//    private fun deleteRecipeFromBookmarks(recipeId: String, onComplete: () -> Unit) {
-//        val currentUser = auth.currentUser
-//        if (currentUser != null) {
-//            firestore.collection("users")
-//                .document(currentUser.uid)
-//                .collection("bookmarks")
-//                .document(recipeId)
-//                .delete()
-//                .addOnCompleteListener { task ->
-//                    if (task.isSuccessful) {
-//                        onComplete()
-//                    } else {
-//                        Toast.makeText(context, "Failed to remove from bookmarks", Toast.LENGTH_SHORT).show()
-//                        onComplete()
-//                    }
-//                }
-//        } else {
-//            onComplete()
-//        }
-//    }
-
-
-//    private fun deleteRecipeTest(recipe: Recipe) {
-//        val currentUser = auth.currentUser
-//        if (currentUser != null) {
-//            // Start a batch write
-//            val batch = firestore.batch()
-//
-//            // Delete the recipe from the 'recipes' collection
-//            val recipeRef = firestore.collection("recipes").document(recipe.id)
-//            batch.delete(recipeRef)
-//
-//            // Delete the recipe from all users' bookmarks
-//            firestore.collection("users").get().addOnSuccessListener { userSnapshots ->
-//                for (userDoc in userSnapshots) {
-//                    val bookmarkRef = userDoc.reference.collection("bookmarks").document(recipe.id)
-//                    batch.delete(bookmarkRef)
-//                }
-//
-//                // Commit the batch
-//                batch.commit().addOnSuccessListener {
-//                    Toast.makeText(context, "Recipe deleted and removed from all bookmarks", Toast.LENGTH_SHORT).show()
-//                    deleteRecipeImage(recipe.imageUrl)
-//
-//                    // Remove the recipe from the local list and refresh the adapter
-//                    userRecipes.remove(recipe)
-//                    recipeAdapter.notifyDataSetChanged()
-//                }.addOnFailureListener { e ->
-//                    Toast.makeText(context, "Failed to delete recipe: ${e.message}", Toast.LENGTH_SHORT).show()
-//                }
-//            }.addOnFailureListener { e ->
-//                Toast.makeText(context, "Failed to access users: ${e.message}", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-
-//    private fun deleteRecipeTest(recipe: Recipe) {
-//        val currentUser = auth.currentUser
-//        if (currentUser != null) {
-//            Log.d(TAG, "Starting deletion process for recipe: ${recipe.id}")
-//
-//            CoroutineScope(Dispatchers.IO).launch {
-//                try {
-//                    // Periksa apakah pengguna ada di koleksi 'users'
-//                    val userDoc = firestore.collection("users").document(currentUser.uid).get().await()
-//                    if (!userDoc.exists()) {
-//                        // Jika tidak ada, buat dokumen pengguna
-//                        firestore.collection("users").document(currentUser.uid).set(mapOf("email" to currentUser.email)).await()
-//                        Log.d(TAG, "Created user document for ${currentUser.email}")
-//                    }
-//
-//                    // Lanjutkan dengan proses penghapusan
-//                    deleteRecipeProcess(recipe)
-//                } catch (e: Exception) {
-//                    Log.e(TAG, "Error in deleteRecipe", e)
-//                    withContext(Dispatchers.Main) {
-//                        Toast.makeText(context, "Error deleting recipe: ${e.message}", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//        } else {
-//            Log.e(TAG, "No current user found")
-//            Toast.makeText(context, "No user logged in", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-
-//    private suspend fun deleteRecipeProcess(recipe: Recipe) {
-//        // Hapus dari koleksi 'recipes'
-//        firestore.collection("recipes").document(recipe.id).delete().await()
-//        Log.d(TAG, "Recipe successfully deleted from 'recipes' collection")
-//
-//        // Hapus dari semua bookmark
-//        deleteFromAllBookmarks(recipe.id)
-//
-//        // Hapus gambar resep
-//        deleteRecipeImage(recipe.imageUrl)
-//
-//        // Perbarui UI
-//        withContext(Dispatchers.Main) {
-//            userRecipes.remove(recipe)
-//            recipeAdapter.notifyDataSetChanged()
-//            Toast.makeText(context, "Recipe deleted successfully", Toast.LENGTH_SHORT).show()
-//        }
-//
-//        // Verifikasi penghapusan
-//        verifyDeletion(recipe.id)
-//    }
-
-//    private suspend fun deleteFromAllBookmarks(recipeId: String) {
-//        Log.d(TAG, "Starting to delete recipe $recipeId from all bookmarks")
-//
-//        try {
-//            val userSnapshots = firestore.collection("users").get().await()
-//            Log.d(TAG, "Retrieved ${userSnapshots.size()} users")
-//
-//            if (userSnapshots.isEmpty) {
-//                Log.w(TAG, "No users found in the 'users' collection")
-//            } else {
-//                userSnapshots.documents.forEach { userDoc ->
-//                    val bookmarkRef = userDoc.reference.collection("bookmarks").document(recipeId)
-//                    bookmarkRef.delete().await() // Hapus tanpa memeriksa keberadaan
-//                    Log.d(TAG, "Attempted to delete bookmark for user ${userDoc.id}")
-//                }
-//            }
-//
-//            Log.d(TAG, "Finished deleting from all bookmarks")
-//        } catch (e: Exception) {
-//            Log.e(TAG, "Error in deleteFromAllBookmarks", e)
-//            throw e
-//        }
-//    }
-
-//    private suspend fun verifyDeletion(recipeId: String) {
-//        Log.d(TAG, "Starting verification of deletion for recipe: $recipeId")
-//
-//        try {
-//            val recipeDoc = firestore.collection("recipes").document(recipeId).get().await()
-//            if (recipeDoc.exists()) {
-//                Log.e(TAG, "Recipe still exists in 'recipes' collection after deletion attempt")
-//            } else {
-//                Log.d(TAG, "Confirmed: Recipe does not exist in 'recipes' collection")
-//            }
-//
-//            val userSnapshots = firestore.collection("users").get().await()
-//            val bookmarkExists = userSnapshots.documents.any { userDoc ->
-//                userDoc.reference.collection("bookmarks").document(recipeId).get().await().exists()
-//            }
-//
-//            if (bookmarkExists) {
-//                Log.e(TAG, "Recipe still exists in at least one user's bookmarks")
-//            } else {
-//                Log.d(TAG, "Confirmed: Recipe does not exist in any user's bookmarks")
-//            }
-//
-//            Log.d(TAG, "Verification complete")
-//        } catch (e: Exception) {
-//            Log.e(TAG, "Error in verifyDeletion", e)
-//        }
-//    }
-//
-//
-//    private suspend fun deleteRecipeImage(imageUrl: String?) {
-//        if (!imageUrl.isNullOrEmpty()) {
-//            try {
-//                val storageRef: StorageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
-//                storageRef.delete().await()
-//                Log.d(TAG, "Recipe image deleted successfully")
-//            } catch (e: Exception) {
-//                Log.e(TAG, "Failed to delete recipe image", e)
-//                // Don't throw this exception as image deletion is not critical
-//            }
-//        }
-//    }
-
     // Function to delete the image from Firebase Storage
     private fun deleteRecipeImage(imageUrl: String?) {
         if (!imageUrl.isNullOrEmpty()) {
@@ -346,6 +130,56 @@ class ProfileFragment : Fragment() {
         transaction.addToBackStack(null)
         transaction.commit()
     }
+
+    // Function to delete recipe
+    private fun deleteRecipe(recipe: Recipe) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            // Check if the recipe is bookmarked
+            firestore.collection("users")
+                .document(currentUser.uid)
+                .collection("bookmarks")
+                .document(recipe.id)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        // Recipe is bookmarked, show a message to unbookmark first
+                        Toast.makeText(
+                            context,
+                            "Cannot delete. Please unbookmark the recipe first.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        // Recipe is not bookmarked, proceed with delete
+                        performDeleteRecipe(recipe)
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, "Failed to check bookmarks", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    // Helper function to perform the actual delete operation
+    private fun performDeleteRecipe(recipe: Recipe) {
+        firestore.collection("recipes")
+            .document(recipe.id)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(context, "Recipe deleted", Toast.LENGTH_SHORT).show()
+
+                // Remove the recipe from the list and refresh the adapter
+                userRecipes.remove(recipe)
+                recipeAdapter.notifyDataSetChanged()
+
+                // After deleting recipe from Firestore, delete the image from Firebase Storage
+                deleteRecipeImage(recipe.imageUrl)
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to delete recipe", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }
 
 

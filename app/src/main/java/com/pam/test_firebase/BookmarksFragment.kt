@@ -39,7 +39,7 @@ class BookmarksFragment : Fragment() {
         bookmarkRecyclerView.layoutManager = LinearLayoutManager(context)
 
         // Load bookmarked recipes with real-time updates
-        loadBookmarkedRecipesTest()
+        loadBookmarkedRecipes()
 
         return view
     }
@@ -52,52 +52,7 @@ class BookmarksFragment : Fragment() {
                 .collection("bookmarks")
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
-                        // Handle error
-                        return@addSnapshotListener
-                    }
-
-                    if (snapshot != null) {
-                        bookmarkedRecipes.clear()
-                        for (document in snapshot.documents) {
-                            val recipe = document.toObject(Recipe::class.java)
-                            recipe?.let { bookmarkedRecipes.add(it) }
-//                            val recipeId = document.id
-//                            // Verify if the recipe still exists
-//                            firestore.collection("recipes").document(recipeId).get()
-//                                .addOnSuccessListener { recipeDoc ->
-//                                    if (recipeDoc.exists()) {
-//                                        val recipe = recipeDoc.toObject(Recipe::class.java)
-//                                        recipe?.let {
-//                                            bookmarkedRecipes.add(it)
-//                                            recipeAdapter.notifyDataSetChanged()
-//                                        }
-//                                    } else {
-//                                        // Recipe doesn't exist, remove from bookmarks
-//                                        deleteRecipeFromBookmarks(recipeId) {}
-//                                    }
-//                                }
-                        }
-
-                        // Update the RecyclerView with the new list of bookmarks
-                        recipeAdapter = RecipeAdapter(requireContext(), bookmarkedRecipes) { recipe ->
-                            // Handle recipe click if necessary
-                            openRecipeDetail(recipe)
-                        }
-                        bookmarkRecyclerView.adapter = recipeAdapter
-                    }
-                }
-        }
-    }
-
-    private fun loadBookmarkedRecipesTest() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            listenerRegistration = firestore.collection("users")
-                .document(currentUser.uid)
-                .collection("bookmarks")
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        Toast.makeText(context, "Error loading bookmarks", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Failed to load bookmarks: ${error.message}", Toast.LENGTH_SHORT).show()
                         return@addSnapshotListener
                     }
 

@@ -92,8 +92,6 @@ class ProfileRecipeAdapter(
             }
 
             // Show the dialog
-//            alertDialog.show()
-            // Show the dialog
             alertDialog.show()
             alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 

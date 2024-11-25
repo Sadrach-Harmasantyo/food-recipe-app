@@ -232,10 +232,6 @@ class AddFragment : Fragment() {
                 // Navigate back to home or recipe list
 
                 // Clear input fields
-//                recipeNameEditText.text.clear()
-//                recipeDescriptionEditText.text.clear()
-//                recipeStepsEditText.text.clear()
-//                selectedImageView.setImageURI(null) // Clear the selected image
                 clearInputFields()
                 redirectToHomeFragment()
             }

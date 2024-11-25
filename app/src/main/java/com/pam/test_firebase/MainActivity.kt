@@ -19,11 +19,6 @@ class MainActivity : AppCompatActivity() {
         val currentUser = auth.currentUser
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-//        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-//
-//        bottomNavigationView.background = null
-//        bottomNavigationView.menu.getItem(2).isEnabled = false
-
         val email = currentUser?.email
 
         // Atur fragment default ke HomeFragment dan kirim email ke fragment
