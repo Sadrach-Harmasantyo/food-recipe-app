@@ -26,7 +26,7 @@ class SplashActivity : AppCompatActivity() {
                 startActivity(intent)
             } else {
                 // Jika belum login, arahkan ke RegisterActivity
-                startActivity(Intent(this, RegisterActivity::class.java))
+                startActivity(Intent(this, LoginRegisterActivity::class.java))
             }
             finish()
         }, 1000)
