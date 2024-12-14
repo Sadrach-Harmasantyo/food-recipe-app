@@ -1,13 +1,6 @@
 package com.pam.test_firebase.data
 
 data class Recipe(
-//    var id: String = "",
-//    val name: String = "",
-//    val description: String = "",
-//    val steps: String = "",
-//    val userEmail: String = "",
-//    val timestamp: String = ""
-
     val name: String = "",
     val description: String = "",
     val steps: String = "",

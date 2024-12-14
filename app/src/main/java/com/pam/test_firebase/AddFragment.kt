@@ -98,17 +98,6 @@ class AddFragment : Fragment() {
         updateButtonStyles2()  // Update button styles to show selected category
     }
 
-    private fun updateButtonStyles(selectedButton: Button) {
-        val buttons = listOf(buttonCategoryBreakfast, buttonCategoryLunch, buttonCategoryDinner)
-        buttons.forEach {
-            it.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray))
-            it.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondary))
-        }
-
-        // Atur warna tombol yang dipilih menjadi lebih menonjol
-        selectedButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary))
-    }
-
     private fun updateButtonStyles2() {
         // Daftar tombol dan kategorinya
         val buttonMap = mapOf(
@@ -248,58 +237,6 @@ class AddFragment : Fragment() {
         recipeTimeEditText.text.clear()
         recipeCaloriesEditText.text.clear()
         selectedImageView.setImageURI(null)
-    }
-
-    private fun addRecipeToFirestore() {
-        // Get the current user
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Toast.makeText(context, "Please login to add a recipe", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Get input values
-        val recipeName = recipeNameEditText.text.toString().trim()
-        val recipeDescription = recipeDescriptionEditText.text.toString().trim()
-        val recipeSteps = recipeStepsEditText.text.toString().trim()
-
-        // Validate inputs
-        if (recipeName.isEmpty() || recipeDescription.isEmpty() || recipeSteps.isEmpty()) {
-            Toast.makeText(context, "All fields must be filled", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Create a recipe object
-        val recipe = hashMapOf(
-            "id" to System.currentTimeMillis().toString(),
-            "name" to recipeName,
-            "description" to recipeDescription,
-            "steps" to recipeSteps,
-            "timestamp" to LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-            "userEmail" to currentUser.email
-        )
-
-        // Add the recipe to Firestore
-        firestore.collection("recipes")
-            .add(recipe)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Recipe added successfully", Toast.LENGTH_SHORT).show()
-
-                recipeNameEditText.text.clear()
-                recipeDescriptionEditText.text.clear()
-                recipeStepsEditText.text.clear()
-
-                val imm =
-                    requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(view?.windowToken, 0)
-
-                redirectToHomeFragment()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to add recipe: ${e.message}", Toast.LENGTH_SHORT)
-                    .show()
-            }
     }
 
     private fun redirectToHomeFragment() {
